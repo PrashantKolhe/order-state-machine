@@ -23,12 +23,8 @@ Supported business outcomes:
 ## Tech stack
 - Java 17
 - Spring Boot 3
-- Maven Wrapper
-- Lombok
-- JUnit 5
-- Mockito
-- MockMvc
-
+- Maven
+  
 ## How to run locally
 Required installations:
 
@@ -193,7 +189,7 @@ curl -s "http://localhost:8080/orders/${ORDER_ID}/history"
 ```
 
 ## Sequence diagram
-The reviewer-friendly sequence diagram lives in [docs/order-sequence-diagram.md](/Users/prashantkolhe/Downloads/Order-State-Machine-Java/docs/order-sequence-diagram.md). It matches the current implementation, including:
+The reviewer-friendly sequence diagram lives in [docs/order-sequence-diagram.md](https://github.com/PrashantKolhe/order-state-machine/blob/main/docs/order-sequence-diagram.md). It matches the current implementation, including:
 
 - create order
 - get order
