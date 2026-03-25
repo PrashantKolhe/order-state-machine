@@ -40,7 +40,7 @@ The scripts below are intended to handle the local setup flow. In most cases, yo
 
 You do not need to install Maven separately because the project includes `./mvnw`.
 
-Follow these steps in sequence:
+From a terminal opened in this project folder, run these steps in sequence:
 
 ```bash
 ./scripts/setup.sh
