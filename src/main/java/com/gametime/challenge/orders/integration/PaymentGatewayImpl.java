@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 public class PaymentGatewayImpl implements PaymentGateway {
 
     @Override
-    public PaymentAuthorizationResult authorizePayment(Order order, PaymentScenario scenario) {
+    public PaymentAuthorizationResult authorizePayment(Order order, String cardNumber, PaymentScenario scenario) {
         if (scenario == PaymentScenario.AUTHORIZATION_DECLINED) {
             return new PaymentAuthorizationResult(
                     PaymentAuthorizationResult.AuthorizationStatus.DECLINED,

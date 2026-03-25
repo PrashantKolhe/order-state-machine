@@ -13,11 +13,12 @@ import com.gametime.challenge.orders.integration.PaymentGateway;
 import com.gametime.challenge.orders.integration.PaymentScenario;
 import com.gametime.challenge.orders.integration.PaymentVoidResult;
 import com.gametime.challenge.orders.repository.OrderRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 /**
  * Coordinates order creation, state transitions, and recovery behavior.
@@ -51,7 +52,10 @@ public class OrderService {
         ensureCanAuthorize(order);
         order.updateLast4(deriveLast4(paymentRequest.getCardNumber()));
 
-        PaymentAuthorizationResult authorizationResult = paymentGateway.authorizePayment(order, scenario);
+        PaymentAuthorizationResult authorizationResult = paymentGateway.authorizePayment(
+                order,
+                paymentRequest.getCardNumber(),
+                scenario);
         if (authorizationResult.isApproved()) {
             order.transitionTo(OrderState.PAYMENT_AUTHORIZED, now(), authorizationResult.getMessage());
         } else {
@@ -131,7 +135,6 @@ public class OrderService {
     }
 
     private String deriveLast4(String cardNumber) {
-        String digitsOnly = cardNumber.replaceAll("\\s+", "");
-        return digitsOnly.substring(digitsOnly.length() - 4);
+        return cardNumber.substring(cardNumber.length() - 4);
     }
 }

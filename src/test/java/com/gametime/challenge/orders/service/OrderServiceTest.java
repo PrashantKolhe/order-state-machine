@@ -1,13 +1,5 @@
 package com.gametime.challenge.orders.service;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import com.gametime.challenge.orders.domain.CurrencyCode;
 import com.gametime.challenge.orders.domain.Order;
 import com.gametime.challenge.orders.domain.OrderState;
@@ -15,20 +7,22 @@ import com.gametime.challenge.orders.dto.CreateOrderRequest;
 import com.gametime.challenge.orders.dto.PaymentRequest;
 import com.gametime.challenge.orders.exception.InvalidOrderStateTransitionException;
 import com.gametime.challenge.orders.exception.OrderNotFoundException;
-import com.gametime.challenge.orders.integration.PaymentAuthorizationResult;
-import com.gametime.challenge.orders.integration.PaymentCompletionResult;
-import com.gametime.challenge.orders.integration.PaymentGateway;
-import com.gametime.challenge.orders.integration.PaymentScenario;
-import com.gametime.challenge.orders.integration.PaymentVoidResult;
+import com.gametime.challenge.orders.integration.*;
 import com.gametime.challenge.orders.repository.OrderRepository;
-import java.time.Instant;
-import java.util.Optional;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.Instant;
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrderServiceTest {
@@ -75,7 +69,7 @@ class OrderServiceTest {
         Order order = buildOrder();
         PaymentRequest paymentRequest = buildPaymentRequest("4111111111111234");
         when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
-        when(paymentGateway.authorizePayment(order, PaymentScenario.AUTHORIZATION_SUCCESS))
+        when(paymentGateway.authorizePayment(order, "4111111111111234", PaymentScenario.AUTHORIZATION_SUCCESS))
                 .thenReturn(new PaymentAuthorizationResult(
                         PaymentAuthorizationResult.AuthorizationStatus.APPROVED,
                         "Payment authorization succeeded."));
@@ -90,6 +84,7 @@ class OrderServiceTest {
         assertThat(updatedOrder.getStateHistory()).hasSize(2);
         assertThat(updatedOrder.getStateHistory().get(1).getReason())
                 .isEqualTo("Payment authorization succeeded.");
+        verify(paymentGateway).authorizePayment(order, "4111111111111234", PaymentScenario.AUTHORIZATION_SUCCESS);
     }
 
     @Test
@@ -97,7 +92,7 @@ class OrderServiceTest {
         Order order = buildOrder();
         PaymentRequest paymentRequest = buildPaymentRequest("4111111111114321");
         when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
-        when(paymentGateway.authorizePayment(order, PaymentScenario.AUTHORIZATION_DECLINED))
+        when(paymentGateway.authorizePayment(order, "4111111111114321", PaymentScenario.AUTHORIZATION_DECLINED))
                 .thenReturn(new PaymentAuthorizationResult(
                         PaymentAuthorizationResult.AuthorizationStatus.DECLINED,
                         "Payment authorization was declined."));
@@ -112,6 +107,7 @@ class OrderServiceTest {
         assertThat(updatedOrder.getStateHistory()).hasSize(2);
         assertThat(updatedOrder.getStateHistory().get(1).getReason())
                 .contains("declined");
+        verify(paymentGateway).authorizePayment(order, "4111111111114321", PaymentScenario.AUTHORIZATION_DECLINED);
     }
 
     @Test

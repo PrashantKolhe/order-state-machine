@@ -10,7 +10,7 @@ public interface PaymentGateway {
     /**
      * Attempts to authorize payment for a new order.
      */
-    PaymentAuthorizationResult authorizePayment(Order order, PaymentScenario scenario);
+    PaymentAuthorizationResult authorizePayment(Order order, String cardNumber, PaymentScenario scenario);
 
     /**
      * Attempts the completion step for an already-authorized order.
